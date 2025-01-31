@@ -29,9 +29,11 @@ const AuthProvider = ({ children }) => {
       setUser(response.data);
       return response.data;
     } catch (err) {
-      throw err.response.data.message;
+      console.error("Login Error:", err); // Log full error for debugging
+      throw err.response?.data?.message || "Login failed. Please try again.";
     }
   };
+  
 
   const logout = async () => {
     try {
