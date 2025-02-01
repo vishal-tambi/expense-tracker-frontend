@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { TextField, Button, Container, Typography } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const AddEditExpense = () => {
@@ -10,15 +10,37 @@ const AddEditExpense = () => {
   const [date, setDate] = useState('');
   const [description, setDescription] = useState('');
   const navigate = useNavigate();
+  const { id } = useParams();
   const { user } = useContext(AuthContext);
-  console.log(user);
+
+  useEffect(() => {
+    if (id) {
+      const fetchExpense = async () => {
+        try {
+          const response = await axios.get(`https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`, { withCredentials: true });
+          const { amount, category, date, description } = response.data;
+          setAmount(amount);
+          setCategory(category);
+          setDate(date);
+          setDescription(description);
+        } catch (err) {
+          console.error(err.response.data.message);
+        }
+      };
+      fetchExpense();
+    }
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const expenseData = { amount, category, date, description };
     try {
-      await axios.post('https://expense-tracker-backend-1t2o.onrender.com', expenseData, { withCredentials: true });
-      navigate('/dashboard'); // Redirect to the dashboard after adding the expense
+      if (id) {
+        await axios.put(`https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`, expenseData, { withCredentials: true });
+      } else {
+        await axios.post('https://expense-tracker-backend-1t2o.onrender.com/api/expenses', expenseData, { withCredentials: true });
+      }
+      navigate('/dashboard');
     } catch (err) {
       console.error(err.response.data.message);
     }
@@ -27,7 +49,7 @@ const AddEditExpense = () => {
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" gutterBottom>
-        Add Expense
+        {id ? 'Edit Expense' : 'Add Expense'}
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -62,7 +84,7 @@ const AddEditExpense = () => {
           onChange={(e) => setDescription(e.target.value)}
         />
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Add Expense
+          {id ? 'Update Expense' : 'Add Expense'}
         </Button>
       </form>
     </Container>
