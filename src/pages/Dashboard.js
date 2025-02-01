@@ -14,7 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/expenses', { withCredentials: true });
+        const response = await axios.get('https://expense-tracker-backend-pi-one.vercel.app/api/expenses', { withCredentials: true });
         setExpenses(response.data.expenses); // Set the expenses state
       } catch (err) {
         console.error(err.response.data.message);

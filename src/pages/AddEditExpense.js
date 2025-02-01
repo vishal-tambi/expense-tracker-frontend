@@ -16,7 +16,7 @@ const AddEditExpense = () => {
     e.preventDefault();
     const expenseData = { amount, category, date, description };
     try {
-      await axios.post('http://localhost:5000/api/expenses', expenseData, { withCredentials: true });
+      await axios.post('https://expense-tracker-backend-pi-one.vercel.app/api/expenses', expenseData, { withCredentials: true });
       navigate('/dashboard'); // Redirect to the dashboard after adding the expense
     } catch (err) {
       console.error(err.response.data.message);

@@ -16,9 +16,9 @@ const ExpenseForm = () => {
     const expenseData = { amount, category, date, description };
     try {
       if (id) {
-        await axios.put(`http://localhost:5000/api/expenses/${id}`, expenseData);
+        await axios.put(`https://expense-tracker-backend-pi-one.vercel.app/api/expenses/${id}`, expenseData);
       } else {
-        await axios.post('http://localhost:5000/api/expenses', expenseData);
+        await axios.post('https://expense-tracker-backend-pi-one.vercel.app/api/expenses', expenseData);
       }
       navigate('/dashboard');
     } catch (err) {
