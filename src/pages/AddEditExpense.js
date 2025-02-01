@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect, useContext } from 'react';
 import { TextField, Button, Container, Typography } from '@mui/material';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-
+import { AuthContext } from '../context/AuthContext'; 
 const AddEditExpense = () => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
@@ -13,14 +13,15 @@ const AddEditExpense = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
 
+  console.log(user);
   useEffect(() => {
     if (id) {
       const fetchExpense = async () => {
         try {
-          const token = localStorage.getItem('token'); // Get the token from localStorage
+          const token = localStorage.getItem('token');
           const response = await axios.get(`https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`, {
             headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
+              Authorization: `Bearer ${token}`,
             },
             withCredentials: true,
           });
@@ -41,37 +42,27 @@ const AddEditExpense = () => {
     e.preventDefault();
     const expenseData = { amount, category, date, description };
     try {
-      const token = localStorage.getItem('token'); // Get the token from localStorage
+      const token = localStorage.getItem('token');
       if (id) {
-        // Update existing expense
-        await axios.put(
-          `https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`,
-          expenseData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-            withCredentials: true,
-          }
-        );
+        await axios.put(`https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`, expenseData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
       } else {
-        // Add new expense
-        await axios.post(
-          'https://expense-tracker-backend-1t2o.onrender.com/api/expenses',
-          expenseData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-            withCredentials: true,
-          }
-        );
+        await axios.post('https://expense-tracker-backend-1t2o.onrender.com/api/expenses', expenseData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
       }
-      navigate('/dashboard'); // Redirect to the dashboard after adding/editing the expense
+      navigate('/dashboard');
     } catch (err) {
       console.error('Error adding/editing expense:', err.response ? err.response.data : err.message);
     }
-
+  };
 
   return (
     <Container maxWidth="sm">
