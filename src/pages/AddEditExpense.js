@@ -71,7 +71,7 @@ const AddEditExpense = () => {
     } catch (err) {
       console.error('Error adding/editing expense:', err.response ? err.response.data : err.message);
     }
-  };
+
 
   return (
     <Container maxWidth="sm">
