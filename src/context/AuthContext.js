@@ -26,23 +26,13 @@ const AuthProvider = ({ children }) => {
         { email, password },
         { withCredentials: true }
       );
-  
-      console.log('Login Response:', response);
-  
-      if (response.data.error) {
-        throw new Error(response.data.error);
-      }
-  
-      const userData = response.data;
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', userData.token); // Store the token
-      return userData;
+      setUser(response.data);
+      return response.data;
     } catch (err) {
-      console.error('Login Error:', err.response ? err.response.data : err.message);
-      throw new Error(err.response?.data?.message || 'Login failed. Please try again.');
+      throw err.response.data.message;
     }
   };
+
 
   const logout = async () => {
     try {
