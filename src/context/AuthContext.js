@@ -1,63 +1,48 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();
 
   // Check if the user is logged in on app load
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('https://expense-tracker-backend-02sg.onrender.com/api/auth/check', {
-          withCredentials: true, // Include cookies
-        });
-        if (response.data.user) {
-          setUser(response.data.user); // Set the user state
-        } else {
-          setUser(null); // Clear the user state if no user is returned
-        }
+        const response = await axios.get('http://localhost:5000/api/auth/check', { withCredentials: true });
+        setUser(response.data.user); // Set the user state
       } catch (err) {
-        console.error('Auth check error:', err); // Log the error for debugging
-        setUser(null); // Clear the user state if the request fails
+        setUser(null); // Clear the user state if not authenticated
       }
     };
     checkAuth();
   }, []);
 
-  // Login function
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'https://expense-tracker-backend-02sg.onrender.com/api/auth/login',
+        'http://localhost:5000/api/auth/login',
         { email, password },
-        { withCredentials: true } // Include cookies
+        { withCredentials: true }
       );
-      setUser(response.data); // Set the user state
-      navigate('/dashboard'); // Redirect to the dashboard after successful login
+      setUser(response.data);
+      return response.data;
     } catch (err) {
-      console.error('Login error:', err); // Log the error for debugging
-      throw err.response?.data?.message || 'Login failed. Please try again.'; // Throw a user-friendly error
+      throw err.response.data.message;
     }
   };
 
-  // Logout function
+
   const logout = async () => {
     try {
-      await axios.post(
-        'https://expense-tracker-backend-02sg.onrender.com/api/auth/logout',
-        {},
-        { withCredentials: true } // Include cookies
-      );
+      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
       setUser(null); // Clear the user state
-      navigate('/login'); // Redirect to the login page after logout
     } catch (err) {
-      console.error('Logout error:', err); // Log the error for debugging
+      console.error(err.response.data.message);
     }
   };
+
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

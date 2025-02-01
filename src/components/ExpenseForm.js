@@ -16,9 +16,9 @@ const ExpenseForm = () => {
     const expenseData = { amount, category, date, description };
     try {
       if (id) {
-        await axios.put(`https://expense-tracker-backend-02sg.onrender.com/api/expenses/${id}`, expenseData);
+        await axios.put(`http://localhost:3000/api/expenses/${id}`, expenseData);
       } else {
-        await axios.post('https://expense-tracker-backend-02sg.onrender.com/api/expenses', expenseData);
+        await axios.post('http://localhost:3000/api/expenses', expenseData);
       }
       navigate('/dashboard');
     } catch (err) {
