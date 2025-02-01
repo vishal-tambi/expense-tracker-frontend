@@ -10,7 +10,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/auth/check', { withCredentials: true });
+        const response = await axios.get('https://expense-tracker-backend-1t2o.onrender.com/api/auth/check', { withCredentials: true });
         setUser(response.data.user); // Set the user state
       } catch (err) {
         setUser(null); // Clear the user state if not authenticated
@@ -22,7 +22,7 @@ const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/login',
+        'https://expense-tracker-backend-1t2o.onrender.com/api/auth/login',
         { email, password },
         { withCredentials: true }
       );
@@ -36,7 +36,7 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+      await axios.post('https://expense-tracker-backend-1t2o.onrender.com/api/auth/logout', {}, { withCredentials: true });
       setUser(null); // Clear the user state
     } catch (err) {
       console.error(err.response.data.message);
