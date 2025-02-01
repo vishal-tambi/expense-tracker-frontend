@@ -10,10 +10,22 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('https://expense-tracker-backend-pi-one.vercel.app/api/auth/check', { withCredentials: true });
-        setUser(response.data.user);
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+        if (token) {
+          const response = await axios.get(
+            'https://expense-tracker-backend-pi-one.vercel.app/api/auth/check',
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the headers
+              },
+              withCredentials: true,
+            }
+          );
+          setUser(response.data.user); // Set the user state
+        }
       } catch (err) {
-        setUser(null);
+        console.error('Auth Check Error:', err.response ? err.response.data : err.message);
+        setUser(null); // Clear the user state if not authenticated
       }
     };
     checkAuth();
@@ -26,19 +38,31 @@ const AuthProvider = ({ children }) => {
         { email, password },
         { withCredentials: true }
       );
-      setUser(response.data);
+      console.log('Login Response:', response); // Log the response
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token); // Store the token in localStorage
+      }
+
+      setUser(response.data.user); // Set the user state
       return response.data;
     } catch (err) {
-      throw err.response.data.message;
+      console.error('Login Error:', err.response ? err.response.data : err.message);
+      throw new Error(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
   const logout = async () => {
     try {
-      await axios.post('https://expense-tracker-backend-pi-one.vercel.app/api/auth/logout', {}, { withCredentials: true });
+      await axios.post(
+        'https://expense-tracker-backend-pi-one.vercel.app/api/auth/logout',
+        {},
+        { withCredentials: true }
+      );
       setUser(null); // Clear the user state
+      localStorage.removeItem('token'); // Remove the token from localStorage
     } catch (err) {
-      console.error(err.response.data.message);
+      console.error('Logout Error:', err.response ? err.response.data : err.message);
     }
   };
 
