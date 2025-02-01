@@ -10,18 +10,10 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token'); // Get the token from localStorage
-        if (token) {
-          const response = await axios.get('https://expense-tracker-backend-1t2o.onrender.com/api/auth/check', {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-            withCredentials: true,
-          });
-          setUser(response.data.user); // Set the user state
-        }
+        const response = await axios.get('http://localhost:5000/api/auth/check', { withCredentials: true });
+        setUser(response.data.user);
       } catch (err) {
-        setUser(null); // Clear the user state if not authenticated
+        setUser(null);
       }
     };
     checkAuth();
@@ -30,38 +22,26 @@ const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        'https://expense-tracker-backend-1t2o.onrender.com/api/auth/login',
+        'http://localhost:5000/api/auth/login',
         { email, password },
         { withCredentials: true }
       );
-      console.log('Login Response:', response); // Log the response
-
-      if (response.data.error) {
-        throw new Error(response.data.error);
-      }
-
-      const userData = response.data;
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', userData.token); // Store the token
-      return userData;
+      setUser(response.data);
+      return response.data;
     } catch (err) {
-      console.error('Login Error:', err.response ? err.response.data : err.message);
-      throw new Error(err.response?.data?.message || 'Login failed. Please try again.');
+      throw err.response.data.message;
     }
   };
 
   const logout = async () => {
     try {
-      await axios.post('https://expense-tracker-backend-1t2o.onrender.com/api/auth/logout', {}, { withCredentials: true });
+      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
       setUser(null); // Clear the user state
-      localStorage.removeItem('user'); // Remove user data from localStorage
-      localStorage.removeItem('token'); // Remove token from localStorage
     } catch (err) {
-      console.error('Logout Error:', err.response ? err.response.data : err.message);
+      console.error(err.response.data.message);
     }
   };
-
+  
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}

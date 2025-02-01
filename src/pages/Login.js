@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { TextField, Button, Container, Typography, Link } from '@mui/material';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
@@ -15,7 +16,7 @@ const Login = () => {
       await login(email, password); // Use the login function from AuthContext
       navigate('/dashboard'); // Redirect to the dashboard after successful login
     } catch (err) {
-      alert(err.message); // Show error message if login fails
+      alert(err); // Show error message if login fails
     }
   };
 
