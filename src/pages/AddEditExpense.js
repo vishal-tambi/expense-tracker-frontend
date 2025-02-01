@@ -17,14 +17,20 @@ const AddEditExpense = () => {
     if (id) {
       const fetchExpense = async () => {
         try {
-          const response = await axios.get(`https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`, { withCredentials: true });
+          const token = localStorage.getItem('token'); // Get the token from localStorage
+          const response = await axios.get(`https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+            withCredentials: true,
+          });
           const { amount, category, date, description } = response.data;
           setAmount(amount);
           setCategory(category);
           setDate(date);
           setDescription(description);
         } catch (err) {
-          console.error(err.response.data.message);
+          console.error('Error fetching expense:', err.response ? err.response.data : err.message);
         }
       };
       fetchExpense();
@@ -35,14 +41,35 @@ const AddEditExpense = () => {
     e.preventDefault();
     const expenseData = { amount, category, date, description };
     try {
+      const token = localStorage.getItem('token'); // Get the token from localStorage
       if (id) {
-        await axios.put(`https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`, expenseData, { withCredentials: true });
+        // Update existing expense
+        await axios.put(
+          `https://expense-tracker-backend-1t2o.onrender.com/api/expenses/${id}`,
+          expenseData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+            withCredentials: true,
+          }
+        );
       } else {
-        await axios.post('https://expense-tracker-backend-1t2o.onrender.com/api/expenses', expenseData, { withCredentials: true });
+        // Add new expense
+        await axios.post(
+          'https://expense-tracker-backend-1t2o.onrender.com/api/expenses',
+          expenseData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+            withCredentials: true,
+          }
+        );
       }
-      navigate('/dashboard');
+      navigate('/dashboard'); // Redirect to the dashboard after adding/editing the expense
     } catch (err) {
-      console.error(err.response.data.message);
+      console.error('Error adding/editing expense:', err.response ? err.response.data : err.message);
     }
   };
 
@@ -59,6 +86,7 @@ const AddEditExpense = () => {
           margin="normal"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
+          required
         />
         <TextField
           label="Category"
@@ -66,6 +94,7 @@ const AddEditExpense = () => {
           margin="normal"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          required
         />
         <TextField
           label="Date"
@@ -75,6 +104,7 @@ const AddEditExpense = () => {
           InputLabelProps={{ shrink: true }}
           value={date}
           onChange={(e) => setDate(e.target.value)}
+          required
         />
         <TextField
           label="Description"

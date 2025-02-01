@@ -10,19 +10,33 @@ const Dashboard = () => {
   const [expenses, setExpenses] = useState([]);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  console.log(user);
+
+  // Log the user for debugging
+  console.log('User:', user);
 
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await axios.get('https://expense-tracker-backend-1t2o.onrender.com/api/expenses', { withCredentials: true });
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+        const response = await axios.get('https://expense-tracker-backend-1t2o.onrender.com/api/expenses', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+          withCredentials: true,
+        });
+        console.log('Expenses Response:', response); // Log the response
         setExpenses(response.data.expenses); // Set the expenses state
       } catch (err) {
-        console.error(err.response.data.message);
+        console.error('Error fetching expenses:', err.response ? err.response.data : err.message);
       }
     };
-    fetchExpenses();
-  }, []);
+
+    if (user) {
+      fetchExpenses(); // Fetch expenses only if the user is authenticated
+    } else {
+      navigate('/login'); // Redirect to login if the user is not authenticated
+    }
+  }, [user, navigate]);
 
   return (
     <Container>
