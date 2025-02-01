@@ -21,28 +21,35 @@ const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(
-        'https://expense-tracker-backend-1t2o.onrender.com/api/auth/login',
-        { email, password },
-        { withCredentials: true }
-      );
-      setUser(response.data);
-      return response.data;
-    } catch (err) {
-      throw err.response.data.message;
+      const response = await axios.post('https://expense-tracker-backend-1t2o.onrender.com/api/auth/login', { email, password }, { withCredentials: true });
+
+      // Check if the response contains an error
+      if (response.data.error) {
+        throw new Error(response.data.error);
+      }
+
+      const userData = response.data;
+
+      // Store user data in state and localStorage
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      return userData;
+    } catch (error) {
+      console.error('Login Error:', error.response ? error.response.data : error.message);
+      throw error;
     }
   };
-
 
   const logout = async () => {
     try {
       await axios.post('https://expense-tracker-backend-1t2o.onrender.com/api/auth/logout', {}, { withCredentials: true });
-      setUser(null); // Clear the user state
+      setUser(null);
+      localStorage.removeItem('user');
     } catch (err) {
-      console.error(err.response.data.message);
+      console.error('Logout Error:', err.response ? err.response.data.message : err.message);
     }
   };
-
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
